@@ -15,7 +15,11 @@ const chapters = [
 ];
 
 const $ = id => document.getElementById(id);
-const state = {active:"function",difficulty:5,view:"question",questionPage:2,answerPage:2,current:null,files:{},urls:{question:"",answer:""},results:readJSON("p3-results",[])};
+const state = {
+  active:"function",difficulty:5,view:"question",questionPage:2,answerPage:2,current:null,files:{},results:readJSON("p3-results",[]),
+  pdfDoc:null,pdfKey:"",pdfLoadingTask:null,pdfRenderTask:null,pdfToken:0,pdfRenderToken:0,zoom:1
+};
+let pdfJsPromise=null;
 
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
 function normalise(name){return name.toLowerCase().replace(/\s+/g,"").replace(/[^a-z0-9&\u4e00-\u9fff]/g,"")}
@@ -83,14 +87,57 @@ async function refreshFiles(){const rows=await getAllFiles();state.files={};rows
 function renderNav(){$("chapterNav").innerHTML=chapters.map(c=>{const ready=state.files[`${c.id}:question`]&&state.files[`${c.id}:answer`];return `<button class="chapter-btn ${state.active===c.id?"active":""}" data-chapter="${c.id}"><span class="icon" style="background:${c.color}">${c.icon}</span><span><b>${c.zh}</b><small>${c.en}</small></span><span class="ready">${ready?"✓":""}</span></button>`}).join("");document.querySelectorAll("[data-chapter]").forEach(btn=>btn.onclick=()=>selectChapter(btn.dataset.chapter))}
 function renderCurrent(){const c=activeChapter();$("largeIcon").textContent=c.icon;$("largeIcon").style.background=c.color;$("chapterZh").textContent=c.zh;$("chapterEn").textContent=c.en;const ready=state.files[`${c.id}:question`];$("emptyState").classList.toggle("hidden",!!ready);$("viewer").classList.toggle("hidden",!ready);if(ready){if(!state.current||state.current.chapter!==c.id)chooseQuestion();else{renderQuestionMeta();loadPdf()}}}
 function renderStats(){const done=state.results.length,correct=state.results.filter(r=>r.correct).length,matched=chapters.filter(c=>state.files[`${c.id}:question`]&&state.files[`${c.id}:answer`]).length;$("doneCount").textContent=done;$("accuracy").textContent=done?`${Math.round(correct/done*100)}%`:"0%";$("accuracyDetail").textContent=done?`${correct}/${done}`:"开始后统计";$("matchCount").textContent=matched;$("matchProgress").style.width=`${matched/8*100}%`}
-function renderLibrary(){$("libraryList").innerHTML=chapters.map(c=>{const q=state.files[`${c.id}:question`],a=state.files[`${c.id}:answer`];if(!q&&!a)return"";const size=((q?.size||0)+(a?.size||0))/1024/1024,warning=(q&&q.healthy===false)||(a&&a.healthy===false);return `<div class="library-item"><span><b>${c.zh}${warning?` <em>需检查</em>`:""}</b><small>${q?"题目 ✓":"题目缺失"} · ${a?"答案 ✓":"答案缺失"} · ${size.toFixed(0)} MB</small></span><button data-delete="${c.id}" type="button">移除缓存</button></div>`}).join("")||`<div class="dialog-tip">还没有缓存章节。</div>`;document.querySelectorAll("[data-delete]").forEach(btn=>btn.onclick=async()=>{await deleteChapter(btn.dataset.delete);state.current=null;await refreshFiles();notify("章节缓存已移除，学习记录仍保留")})}
+function renderLibrary(){$("libraryList").innerHTML=chapters.map(c=>{const q=state.files[`${c.id}:question`],a=state.files[`${c.id}:answer`];if(!q&&!a)return"";const size=((q?.size||0)+(a?.size||0))/1024/1024,warning=(q&&q.healthy===false)||(a&&a.healthy===false);return `<div class="library-item"><span><b>${c.zh}${warning?` <em>需检查</em>`:""}</b><small>${q?"题目 ✓":"题目缺失"} · ${a?"答案 ✓":"答案缺失"} · ${size.toFixed(0)} MB</small></span><button data-delete="${c.id}" type="button">移除缓存</button></div>`}).join("")||`<div class="dialog-tip">还没有缓存章节。</div>`;document.querySelectorAll("[data-delete]").forEach(btn=>btn.onclick=async()=>{if(btn.dataset.delete===state.active){state.pdfToken++;await disposePdf()}await deleteChapter(btn.dataset.delete);state.current=null;await refreshFiles();notify("章节缓存已移除，学习记录仍保留")})}
 function renderQuestionMeta(){if(!state.current){$("questionMeta").textContent="等待抽题";return}const qText=state.current.exactQuestion?`识别题号 ${state.current.difficulty}`:`难度 ${state.current.difficulty} · 页段抽取`,aText=state.current.exactAnswer?"答案已自动匹配":"答案页为估算";$("questionMeta").textContent=`${qText} · ${aText}`;$("questionMeta").classList.toggle("estimated",!state.current.exactAnswer)}
 
 function selectChapter(id){state.active=id;state.current=null;state.view="question";renderNav();renderTabs();renderCurrent()}
-function maxPage(){const c=activeChapter();return state.view==="question"?c.q:c.a}
+function currentPdfKey(){const key=`${state.active}:${state.view}`,row=state.files[key];return row?`${key}:${row.updatedAt||row.size}`:""}
+function maxPage(){if(state.pdfDoc&&state.pdfKey===currentPdfKey())return state.pdfDoc.numPages;const c=activeChapter();return state.view==="question"?c.q:c.a}
 function currentPage(){return state.view==="question"?state.questionPage:state.answerPage}
-function setPage(value){const page=Math.max(1,Math.min(maxPage(),Number(value)||1));if(state.view==="question")state.questionPage=page;else state.answerPage=page;loadPdf()}
-function loadPdf(){const row=state.files[`${state.active}:${state.view}`];if(!row){$("pdfFrame").src="about:blank";notify(state.view==="answer"?"这个章节还没有导入答案":"这个章节还没有导入题目");return}if(state.urls[state.view])URL.revokeObjectURL(state.urls[state.view]);state.urls[state.view]=URL.createObjectURL(row.blob);$("pageInput").value=currentPage();$("pdfFrame").src=`${state.urls[state.view]}#page=${currentPage()}&view=FitH`}
+function updatePager(){const page=currentPage(),total=maxPage();$("pageInput").value=page;$("pageInput").max=total;$("pageTotal").textContent=state.pdfDoc&&state.pdfKey===currentPdfKey()?total:"—";$("prevPage").disabled=page<=1;$("nextPage").disabled=page>=total}
+function setPage(value){const page=Math.max(1,Math.min(maxPage(),Number(value)||1));if(state.view==="question")state.questionPage=page;else state.answerPage=page;$("pdfStage").scrollTop=0;$("pdfStage").scrollLeft=0;loadPdf()}
+
+async function ensurePdfJs(){
+  if(!pdfJsPromise)pdfJsPromise=import("./pdf.mjs").then(pdfjs=>{pdfjs.GlobalWorkerOptions.workerSrc=new URL("./pdf.worker.mjs",location.href).href;return pdfjs}).catch(error=>{pdfJsPromise=null;throw error});
+  return pdfJsPromise;
+}
+
+function cancelPdfRender(){state.pdfRenderToken++;if(state.pdfRenderTask){try{state.pdfRenderTask.cancel()}catch{}state.pdfRenderTask=null}}
+async function disposePdf(){
+  cancelPdfRender();const loading=state.pdfLoadingTask,doc=state.pdfDoc;state.pdfLoadingTask=null;state.pdfDoc=null;state.pdfKey="";
+  try{if(loading)await loading.destroy()}catch{}
+  try{if(doc)await doc.destroy()}catch{}
+}
+function showPdfLoading(text="正在打开页面…"){$("pdfLoading").textContent=text;$("pdfLoading").classList.remove("hidden");$("pdfCanvas").classList.add("hidden");$("pdfError").classList.add("hidden")}
+function showPdfError(text){$("pdfLoading").classList.add("hidden");$("pdfCanvas").classList.add("hidden");$("pdfErrorText").textContent=text;$("pdfError").classList.remove("hidden")}
+
+async function renderPdfPage(token=state.pdfToken){
+  const doc=state.pdfDoc;if(!doc||token!==state.pdfToken)return;cancelPdfRender();const renderToken=state.pdfRenderToken;showPdfLoading(`正在打开第 ${currentPage()} 页…`);
+  try{
+    const pageNumber=Math.max(1,Math.min(doc.numPages,currentPage())),page=await doc.getPage(pageNumber);if(token!==state.pdfToken||renderToken!==state.pdfRenderToken)return;
+    const baseViewport=page.getViewport({scale:1}),stage=$("pdfStage"),available=Math.max(260,stage.clientWidth-28),fitScale=available/baseViewport.width,viewport=page.getViewport({scale:fitScale*state.zoom});
+    let outputScale=Math.min(window.devicePixelRatio||1,2),pixelArea=viewport.width*viewport.height*outputScale*outputScale;if(pixelArea>16000000)outputScale=Math.max(1,Math.sqrt(16000000/(viewport.width*viewport.height)));
+    const canvas=$("pdfCanvas"),context=canvas.getContext("2d",{alpha:false});canvas.width=Math.max(1,Math.floor(viewport.width*outputScale));canvas.height=Math.max(1,Math.floor(viewport.height*outputScale));canvas.style.width=`${Math.floor(viewport.width)}px`;canvas.style.height=`${Math.floor(viewport.height)}px`;
+    const transform=outputScale===1?null:[outputScale,0,0,outputScale,0,0],renderTask=page.render({canvasContext:context,viewport,transform});state.pdfRenderTask=renderTask;await renderTask.promise;if(token!==state.pdfToken||renderToken!==state.pdfRenderToken)return;
+    state.pdfRenderTask=null;$("pdfLoading").classList.add("hidden");$("pdfError").classList.add("hidden");canvas.classList.remove("hidden");canvas.setAttribute("aria-label",`PDF 第 ${pageNumber} 页，共 ${doc.numPages} 页`);updatePager();page.cleanup();
+  }catch(error){if(error?.name==="RenderingCancelledException"||token!==state.pdfToken||renderToken!==state.pdfRenderToken)return;state.pdfRenderTask=null;showPdfError("这份 PDF 可能不完整，或当前页面无法解析。可以打开原 PDF 检查，必要时重新导出后再导入。");console.error(error)}
+}
+
+async function loadPdf(){
+  const row=state.files[`${state.active}:${state.view}`],key=currentPdfKey(),token=++state.pdfToken;updatePager();
+  if(!row){await disposePdf();if(token!==state.pdfToken)return;$("pageTotal").textContent="—";showPdfError(state.view==="answer"?"这个章节还没有导入答案。":"这个章节还没有导入题目。");notify(state.view==="answer"?"这个章节还没有导入答案":"这个章节还没有导入题目");return}
+  showPdfLoading("正在读取 PDF…");
+  try{
+    if(!state.pdfDoc||state.pdfKey!==key){
+      await disposePdf();if(token!==state.pdfToken)return;const pdfjs=await ensurePdfJs(),data=new Uint8Array(await row.blob.arrayBuffer());if(token!==state.pdfToken)return;
+      const loadingTask=pdfjs.getDocument({data,cMapUrl:new URL("./",location.href).href,cMapPacked:true,useSystemFonts:true,isEvalSupported:false,stopAtErrors:false});state.pdfLoadingTask=loadingTask;const doc=await loadingTask.promise;if(token!==state.pdfToken){await doc.destroy();return}state.pdfLoadingTask=null;state.pdfDoc=doc;state.pdfKey=key;
+    }
+    if(token!==state.pdfToken)return;const page=Math.max(1,Math.min(state.pdfDoc.numPages,currentPage()));if(state.view==="question")state.questionPage=page;else state.answerPage=page;updatePager();await renderPdfPage(token);
+  }catch(error){if(token!==state.pdfToken)return;state.pdfLoadingTask=null;state.pdfDoc=null;state.pdfKey="";$("pageTotal").textContent="—";showPdfError(row.healthy===false?"这份 PDF 文件不完整，请从原文档重新导出 PDF 后再导入。":"无法打开这份 PDF。可以先打开原 PDF 检查，或重新导出后再导入。");console.error(error)}
+}
+
+function setZoom(value){state.zoom=Math.max(.75,Math.min(2.5,value));$("zoomReset").textContent=state.zoom===1?"适宽":`${Math.round(state.zoom*100)}%`;$("zoomOut").disabled=state.zoom<=.75;$("zoomIn").disabled=state.zoom>=2.5;renderPdfPage()}
+function openOriginalPdf(){const row=state.files[`${state.active}:${state.view}`];if(!row)return;const url=URL.createObjectURL(row.blob),link=document.createElement("a");link.href=url;link.target="_blank";link.rel="noopener";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 function renderTabs(){document.querySelectorAll("[data-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.view===state.view))}
 function updateDifficulty(value){state.difficulty=Number(value);$("difficultyValue").textContent=value;$("difficultyLabel").textContent=value<=3?"基础":value<=7?"进阶":"挑战"}
 function record(correct){state.results.push({chapter:state.active,difficulty:state.current?.difficulty||state.difficulty,page:state.questionPage,correct,at:Date.now()});localStorage.setItem("p3-results",JSON.stringify(state.results));renderStats();notify(correct?"已记录：已经掌握":"已加入重做记录")}
@@ -102,8 +149,12 @@ function bind(){
   [$("headerImport"),$("emptyImport")].forEach(btn=>btn.onclick=()=>$("managerDialog").showModal());$("openManager").onclick=()=>$("managerDialog").showModal();$("closeNotice").onclick=()=>$("notice").classList.add("hidden");
   $("fileInput").onchange=e=>{importFiles(e.target.files);e.target.value=""};const zone=$("dropZone");["dragenter","dragover"].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.add("drag")}));["dragleave","drop"].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.remove("drag")}));zone.addEventListener("drop",e=>importFiles(e.dataTransfer.files));
   $("difficulty").oninput=e=>updateDifficulty(e.target.value);$("randomQuestion").onclick=chooseQuestion;document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{state.view=btn.dataset.view;if(state.view==="answer"&&state.current)state.answerPage=state.current.aPage;renderTabs();loadPdf()});
-  $("prevPage").onclick=()=>setPage(currentPage()-1);$("nextPage").onclick=()=>setPage(currentPage()+1);$("pageInput").onchange=e=>setPage(e.target.value);$("retry").onclick=()=>record(false);$("mastered").onclick=()=>record(true);$("exportProgress").onclick=downloadJSON;$("importProgress").onchange=e=>{if(e.target.files[0])importResults(e.target.files[0]);e.target.value=""};
+  $("prevPage").onclick=()=>setPage(currentPage()-1);$("nextPage").onclick=()=>setPage(currentPage()+1);$("pageInput").onchange=e=>setPage(e.target.value);$("pageInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();setPage(e.target.value);e.target.blur()}};
+  $("zoomOut").onclick=()=>setZoom(state.zoom-.25);$("zoomReset").onclick=()=>setZoom(1);$("zoomIn").onclick=()=>setZoom(state.zoom+.25);$("openOriginal").onclick=openOriginalPdf;
+  $("pdfStage").onkeydown=e=>{if(e.target!==$("pdfStage"))return;if(e.key==="ArrowLeft"){e.preventDefault();setPage(currentPage()-1)}else if(e.key==="ArrowRight"){e.preventDefault();setPage(currentPage()+1)}};
+  let resizeTimer;window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>renderPdfPage(),160)},{passive:true});
+  $("retry").onclick=()=>record(false);$("mastered").onclick=()=>record(true);$("exportProgress").onclick=downloadJSON;$("importProgress").onchange=e=>{if(e.target.files[0])importResults(e.target.files[0]);e.target.value=""};
 }
 
-async function init(){bind();updateDifficulty(state.difficulty);await refreshFiles();if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{})}
+async function init(){bind();updateDifficulty(state.difficulty);setZoom(1);await refreshFiles();if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{})}
 init();

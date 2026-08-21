@@ -67,11 +67,30 @@
 
         <div class="viewer hidden" id="viewer">
           <div class="viewer-toolbar">
-            <div class="tabs"><button class="active" data-view="question">题目</button><button data-view="answer">答案</button></div>
+            <div class="tabs"><button class="active" data-view="question" type="button">题目</button><button data-view="answer" type="button">答案</button></div>
             <span class="question-meta" id="questionMeta">等待抽题</span>
-            <div class="pager"><button id="prevPage">‹</button><span>第 <input id="pageInput" inputmode="numeric" value="2"> 页</span><button id="nextPage">›</button></div>
+            <div class="viewer-actions">
+              <div class="zoom-controls" aria-label="页面缩放">
+                <button id="zoomOut" type="button" aria-label="缩小">−</button>
+                <button id="zoomReset" type="button">适宽</button>
+                <button id="zoomIn" type="button" aria-label="放大">＋</button>
+              </div>
+              <div class="pager">
+                <button id="prevPage" type="button" aria-label="上一页">‹</button>
+                <span>第 <input id="pageInput" inputmode="numeric" pattern="[0-9]*" value="2" aria-label="页码"> / <span id="pageTotal">—</span> 页</span>
+                <button id="nextPage" type="button" aria-label="下一页">›</button>
+              </div>
+            </div>
           </div>
-          <iframe id="pdfFrame" title="PDF 题目查看器"></iframe>
+          <div class="pdf-stage" id="pdfStage" tabindex="0" aria-label="PDF 页面阅读区">
+            <div class="pdf-status" id="pdfLoading" role="status">正在打开页面…</div>
+            <canvas id="pdfCanvas" class="hidden" aria-label="当前 PDF 页面"></canvas>
+            <div class="pdf-error hidden" id="pdfError" role="alert">
+              <b>这页暂时无法显示</b>
+              <p id="pdfErrorText">请重试，或打开原 PDF。</p>
+              <button id="openOriginal" type="button">打开原 PDF</button>
+            </div>
+          </div>
           <div class="result-row"><span>这道题做得怎么样？</span><button class="retry" id="retry">需要重做</button><button class="mastered" id="mastered">已经掌握</button></div>
         </div>
       </section>
