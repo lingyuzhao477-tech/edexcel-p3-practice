@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1f6a50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="P3训练">
+  <title>Edexcel P3 真题训练</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">P3</span>
+        <span><b>Past Paper Studio</b><small>Edexcel IAL Mathematics</small></span>
+      </div>
+      <p class="nav-label">章节训练</p>
+      <nav id="chapterNav" aria-label="章节"></nav>
+      <button class="manager-link" id="openManager">⌁ 题库管理</button>
+      <div class="local-note"><b>资料保存在本机</b><small>可从百度网盘下载后导入</small></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">2014—2025 · EDEXCEL P3</p>
+          <h1>真题训练室</h1>
+          <p class="subtitle">按章节练习，用题号难度逐级推进。</p>
+        </div>
+        <button class="primary" id="headerImport">导入题目与答案</button>
+      </header>
+
+      <div class="notice hidden" id="notice"><span id="noticeText"></span><button id="closeNotice">×</button></div>
+
+      <section class="stats">
+        <article><span>已练习</span><strong id="doneCount">0</strong><small>道题</small></article>
+        <article><span>正确率</span><strong id="accuracy">0%</strong><small id="accuracyDetail">开始后统计</small></article>
+        <article class="match-stat"><span>已缓存章节</span><strong><span id="matchCount">0</span><em>/8</em></strong><div class="progress"><i id="matchProgress"></i></div></article>
+      </section>
+
+      <section class="practice">
+        <div class="practice-head">
+          <div class="current-title">
+            <span class="large-icon" id="largeIcon">F</span>
+            <span><small>当前章节</small><b id="chapterZh">函数</b><em id="chapterEn">Functions</em></span>
+          </div>
+          <div class="difficulty">
+            <label>题号难度 <b id="difficultyValue">5</b><span id="difficultyLabel">进阶</span></label>
+            <input id="difficulty" type="range" min="1" max="10" value="5">
+            <div><span>1 基础</span><span>10 挑战</span></div>
+          </div>
+          <button class="random" id="randomQuestion">随机抽一道 →</button>
+        </div>
+
+        <div class="empty" id="emptyState">
+          <div class="empty-icon">∫<sup>?</sup></div>
+          <h2>先导入一个章节</h2>
+          <p>从百度网盘把该章节的题目和答案保存到“文件”，然后在这里同时选择两份 PDF。</p>
+          <button class="primary" id="emptyImport">选择 PDF 或 ZIP</button>
+        </div>
+
+        <div class="viewer hidden" id="viewer">
+          <div class="viewer-toolbar">
+            <div class="tabs"><button class="active" data-view="question">题目</button><button data-view="answer">答案</button></div>
+            <div class="pager"><button id="prevPage">‹</button><span>第 <input id="pageInput" inputmode="numeric" value="2"> 页</span><button id="nextPage">›</button></div>
+          </div>
+          <iframe id="pdfFrame" title="PDF 题目查看器"></iframe>
+          <div class="result-row"><span>这道题做得怎么样？</span><button class="retry" id="retry">需要重做</button><button class="mastered" id="mastered">已经掌握</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="managerDialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head"><div><p class="eyebrow">LOCAL LIBRARY</p><h2>题库管理</h2></div><button class="close" value="cancel">×</button></div>
+      <p class="dialog-tip">建议每次只缓存最近使用的 2—3 个章节。更新同名章节时会自动替换旧文件，练习记录不会删除。</p>
+      <label class="drop-zone" id="dropZone">选择或拖入 PDF / ZIP<input id="fileInput" type="file" accept=".pdf,.zip,application/pdf,application/zip" multiple></label>
+      <div class="library-list" id="libraryList"></div>
+      <div class="backup-row"><button type="button" id="exportProgress">导出学习记录</button><label>导入学习记录<input id="importProgress" type="file" accept="application/json,.json"></label></div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
