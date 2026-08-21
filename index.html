@@ -31,7 +31,7 @@
         <div>
           <p class="eyebrow">2014—2025 · EDEXCEL P3</p>
           <h1>真题训练室</h1>
-          <p class="subtitle">按章节练习，用题号难度逐级推进。</p>
+          <p class="subtitle">首次导入题库，之后按章节与真实题号直接练习。</p>
         </div>
         <button class="primary" id="headerImport">导入题目与答案</button>
       </header>
@@ -61,13 +61,14 @@
         <div class="empty" id="emptyState">
           <div class="empty-icon">∫<sup>?</sup></div>
           <h2>先导入一个章节</h2>
-          <p>从百度网盘把该章节的题目和答案保存到“文件”，然后在这里同时选择两份 PDF。</p>
-          <button class="primary" id="emptyImport">选择 PDF 或 ZIP</button>
+          <p>从百度网盘把题目和答案 ZIP 保存到“文件”，分别导入一次即可。全部资料只保存在这台设备。</p>
+          <button class="primary" id="emptyImport">导入题目或答案 ZIP</button>
         </div>
 
         <div class="viewer hidden" id="viewer">
           <div class="viewer-toolbar">
             <div class="tabs"><button class="active" data-view="question">题目</button><button data-view="answer">答案</button></div>
+            <span class="question-meta" id="questionMeta">等待抽题</span>
             <div class="pager"><button id="prevPage">‹</button><span>第 <input id="pageInput" inputmode="numeric" value="2"> 页</span><button id="nextPage">›</button></div>
           </div>
           <iframe id="pdfFrame" title="PDF 题目查看器"></iframe>
@@ -80,8 +81,8 @@
   <dialog id="managerDialog">
     <form method="dialog" class="dialog-card">
       <div class="dialog-head"><div><p class="eyebrow">LOCAL LIBRARY</p><h2>题库管理</h2></div><button class="close" value="cancel">×</button></div>
-      <p class="dialog-tip">建议每次只缓存最近使用的 2—3 个章节。更新同名章节时会自动替换旧文件，练习记录不会删除。</p>
-      <label class="drop-zone" id="dropZone">选择或拖入 PDF / ZIP<input id="fileInput" type="file" accept=".pdf,.zip,application/pdf,application/zip" multiple></label>
+      <p class="dialog-tip"><b>首次设置：</b>先选择题目 ZIP，完成后再选择答案 ZIP。大文件会逐份导入；更新同名章节时自动替换，练习记录不会删除。</p>
+      <label class="drop-zone" id="dropZone">选择题目 ZIP、答案 ZIP 或 PDF<input id="fileInput" type="file" accept=".pdf,.zip,application/pdf,application/zip" multiple></label>
       <div class="library-list" id="libraryList"></div>
       <div class="backup-row"><button type="button" id="exportProgress">导出学习记录</button><label>导入学习记录<input id="importProgress" type="file" accept="application/json,.json"></label></div>
     </form>
