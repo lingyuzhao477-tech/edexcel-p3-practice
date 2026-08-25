@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#17233c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="积分训练">
+  <title>P3/P4 积分训练</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <div class="brand"><b>∫</b><span><strong>Integral Lab</strong><small>Edexcel P3 · P4</small></span></div>
+    <div class="stats">本设备已练 <span id="done">0</span> 题 <b><span id="wrong">0</span> 道待复习</b></div>
+  </header>
+
+  <section class="paper-tabs" aria-label="试卷选择">
+    <button class="active p3" data-paper="P3"><b>P3 积分</b><small>基础积分 · 定积分 · 换元 · 面积</small></button>
+    <button data-paper="P4"><b>P4 积分</b><small>分部 · 三角 · 部分分式 · 代换</small></button>
+  </section>
+
+  <nav class="topics"><span>专题分类</span><div id="topicButtons"></div><button id="random">⤨ 本专题随机</button></nav>
+
+  <main class="workspace">
+    <section class="question-card">
+      <div class="meta"><b id="paperBadge">P3</b><span id="topicBadge">基础积分</span><span id="level">●○○</span></div>
+      <p id="counter"></p>
+      <h1 id="question"></h1>
+      <aside>先在右侧写出完整过程，再查看提示或答案。</aside>
+      <button class="reveal" id="hintBtn">给我一个提示</button>
+      <div class="note hidden" id="hintBox"><b>思路提示</b><p id="hint"></p></div>
+      <button class="reveal blue" id="answerBtn">检查答案与步骤</button>
+      <div class="solution hidden" id="solution"><b>分步解析</b><ol id="steps"></ol><strong id="finalAnswer"></strong><div class="mark"><span>这题做得怎么样？</span><button id="correct">✓ 做对了</button><button id="incorrect">↺ 加入错题</button></div></div>
+      <button class="next" id="next">下一题 →</button>
+    </section>
+
+    <section class="pad">
+      <div class="padtop"><div><small>APPLE PENCIL READY</small><h2>手写解题区</h2></div><span>直接在方格纸上写</span></div>
+      <div class="tools"><button class="active" id="pen">✎ 笔</button><button id="eraser">⌫ 橡皮</button><button id="undo">↶ 撤销</button><button id="clear">清空</button><button id="save">↓ 保存</button><label>粗细 <input id="size" type="range" min="1" max="8" value="3"></label></div>
+      <div class="canvas-wrap" id="canvasWrap"><canvas id="canvas"></canvas></div>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
