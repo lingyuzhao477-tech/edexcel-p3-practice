@@ -42,6 +42,72 @@ const BANK=[
 {id:41,paper:'P4',topic:'部分分式',level:3,q:'求 ∫(x²+4x+1)/(x²−1) dx',hint:'这是非真分式，先做多项式除法。',steps:['原式=1+(4x+2)/(x²−1)','把 (4x+2)/[(x−1)(x+1)] 拆分','得到 1+3/(x−1)+1/(x+1)。'],answer:'x+3ln|x−1|+ln|x+1| + C'},
 {id:42,paper:'P4',topic:'部分分式',level:3,q:'计算 ∫₀¹ 1/[(x+1)(x+2)] dx',hint:'拆成 1/(x+1)−1/(x+2)。',steps:['原函数为 ln(x+1)−ln(x+2)','代入 1 得 ln2−ln3','减去代入 0 的 ln1−ln2。'],answer:'ln(4/3)'}
 ];
+
+// Extra practice generated from the methods covered by the uploaded P3/P4 pages.
+// The wording and numerical values are original so the public site does not republish textbook pages.
+let extraId=43;
+const add=(paper,topic,level,q,hint,steps,answer)=>BANK.push({id:extraId++,paper,topic,level,q,hint,steps,answer});
+
+[[5,3,2],[7,-4,5],[3,6,-1],[8,-5,4]].forEach(([a,b,c],i)=>add('P3','基础积分',i<2?1:2,
+  `求 ∫(${a}x² ${b<0?'−':'+'} ${Math.abs(b)}x ${c<0?'−':'+'} ${Math.abs(c)}) dx`,
+  '逐项使用幂函数积分法，幂次加 1 后除以新幂次。',
+  [`∫${a}x²dx=(${a}/3)x³`,`∫${b}x dx=(${b}/2)x²`,`常数项积分为 ${c}x`,'合并并加 C。'],
+  `(${a}/3)x³ + (${b}/2)x² + ${c}x + C`));
+
+[[2,4,3],[3,2,4],[4,5,2],[5,1,3]].forEach(([a,b,n])=>add('P3','换元积分',2,
+  `求 ∫${a}x(x²+${b})^${n} dx`,'令 u=x²+常数，把 x dx 换成 du/2。',
+  [`令 u=x²+${b}，du=2x dx`,`原式=(${a}/2)∫u^${n}du`,'使用幂函数积分法后代回。'],
+  `${a}/[${2*(n+1)}](x²+${b})^${n+1} + C`));
+
+[[2,1,3],[3,2,2],[4,-1,2],[5,3,1]].forEach(([m,c,u])=>add('P3','定积分',2,
+  `计算 ∫₀^${u} (${m}x+${c}) dx`,'先求原函数，再计算 F(上限)−F(0)。',
+  [`原函数为 ${m/2}x²+${c}x`,`代入 x=${u}`,'减去 x=0 时的值。'],
+  String(m*u*u/2+c*u)));
+
+[3,5,6,8].forEach((a,i)=>add('P3','面积',i<2?2:3,
+  `求曲线 y=x²−${a}x 与 x 轴围成的有限区域面积。`,'先解 x(x−a)=0；两根之间曲线在 x 轴下方。',
+  [`交点为 x=0 和 x=${a}`,`面积=−∫₀^${a}(x²−${a}x)dx`,'求原函数并取正值。'],
+  `${a**3}/6`));
+
+[['sin',4,'−(1/4)cos(4x) + C'],['sin',7,'−(1/7)cos(7x) + C'],['cos',2,'(1/2)sin(2x) + C'],['cos',5,'(1/5)sin(5x) + C'],['sec²',3,'(1/3)tan(3x) + C']].forEach(([f,k,ans])=>add('P3','三角函数积分',2,
+  `求 ∫${f}(${k}x) dx`,'先识别基本三角函数的原函数，再补偿括号内导数。',
+  [`令 u=${k}x，dx=du/${k}`,'对基本三角函数积分','代回 u 并加 C。'],ans));
+
+[["sin²",2,'x/2−sin(4x)/8+C'],["sin²",3,'x/2−sin(6x)/12+C'],["cos²",2,'x/2+sin(4x)/8+C'],["cos²",4,'x/2+sin(8x)/16+C'],["sin³",1,'−cosx+cos³x/3+C']].forEach(([f,k,ans])=>add('P3','三角恒等式',3,
+  `求 ∫${f}(${k}x) dx`,'平方使用半角公式；奇次幂保留一个因子后换元。',
+  ['先选择合适的三角恒等式','把被积函数化成可直接积分的形式','逐项积分并整理。'],ans));
+
+[[2,3],[3,4],[4,5],[5,2]].forEach(([a,b])=>add('P3','反向链式法则',2,
+  `求 ∫${a}/(${a}x+${b}) dx`,'分子与分母的导数相同，结果是对数。',
+  [`令 u=${a}x+${b}，du=${a}dx`,'原式变成 ∫1/u du','代回并加 C。'],
+  `ln|${a}x+${b}| + C`));
+
+[[2,2],[3,2],[4,3],[5,2]].forEach(([a,k])=>add('P4','分部积分',2,
+  `求 ∫x e^(${a}x) dx`,'令 u=x，dv=e^(ax)dx。',
+  [`u=x，du=dx；v=e^(${a}x)/${a}`,'代入 ∫u dv=uv−∫v du','整理并加 C。'],
+  `e^(${a}x)(x/${a}−1/${a*a}) + C`));
+[[2,'cos'],[3,'cos'],[2,'sin'],[4,'sin']].forEach(([a,f])=>add('P4','分部积分',3,
+  `求 ∫x ${f}(${a}x) dx`,'令 u=x，另一部分作为 dv。',
+  ['先求出 v','应用分部积分公式','对剩余的基本三角函数积分。'],
+  f==='cos'?`(x/${a})sin(${a}x)+cos(${a}x)/${a*a}+C`:`−(x/${a})cos(${a}x)+sin(${a}x)/${a*a}+C`));
+
+[[2,'sin²','x/2−sin(4x)/8+C'],[3,'cos²','x/2+sin(6x)/12+C'],[1,'sin³','−cosx+cos³x/3+C'],[1,'cos³','sinx−sin³x/3+C'],[2,'sec²','tan(2x)/2+C'],[3,'cosec²','−cot(3x)/3+C'],[2,'tan','−ln|cos(2x)|/2+C']].forEach(([k,f,ans])=>add('P4','三角积分',3,
+  `求 ∫${f}(${k}x) dx`,'根据平方、奇次幂或基本导数选择恒等式与换元。',
+  ['识别函数结构','使用恒等式或令 u 为括号内函数','积分后代回并加 C。'],ans));
+
+[[1,2,2,-1],[2,3,3,1],[1,4,4,-2],[3,5,2,2],[2,5,5,-1],[1,3,3,2],[4,7,2,-3],[3,8,4,1]].forEach(([a,b,A,B])=>{
+  const px=A+B, pc=A*b+B*a;
+  add('P4','部分分式',3,`求 ∫(${px}x+${pc})/[(x+${a})(x+${b})] dx`,
+    `拆成 A/(x+${a})+B/(x+${b})。`,
+    ['设两个待定系数','代入使其中一个因式为 0 的 x 值','分别得到两个对数项。'],
+    `${A}ln|x+${a}| ${B<0?'−':'+'} ${Math.abs(B)}ln|x+${b}| + C`);
+});
+
+[[2,3,2],[3,1,3],[4,2,2],[5,4,3],[2,6,4],[3,5,2],[4,1,3]].forEach(([a,b,n])=>add('P4','代换积分',3,
+  `求 ∫${a}x(x²+${b})^${n} dx`,'令 u=x²+b，注意 x dx=du/2。',
+  [`u=x²+${b}，du=2x dx`,`原式=(${a}/2)∫u^${n}du`,'积分后代回。'],
+  `${a}/[${2*(n+1)}](x²+${b})^${n+1} + C`));
+
 let paper='P3',topic='全部专题',index=0,tool='pen',size=3,drawing=false,history=[];
 const $=id=>document.getElementById(id), state=JSON.parse(localStorage.getItem('integral-progress')||'{"done":0,"wrong":[]}');
 function topics(){return ['全部专题',...new Set(BANK.filter(x=>x.paper===paper).map(x=>x.topic))]}
