@@ -25,7 +25,22 @@ const BANK=[
 {id:24,paper:'P3',topic:'定积分',level:3,q:'计算 ∫₀^(π/4) sec²(2x) dx',hint:'原函数是 ½tan(2x)，但先检查上限处函数是否有定义。',steps:['当 x→π/4 时，tan(2x)→∞','上限 x=π/4 处 cos(2x)=0','这是反常积分，并不收敛。'],answer:'积分发散（不存在有限值）'},
 {id:25,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫sin³x dx',hint:'保留一个 sinx，把 sin²x 换成 1−cos²x。',steps:['sin³x=sinx(1−cos²x)','令 u=cosx，du=−sinx dx','积分 −∫(1−u²)du','代回并加 C。'],answer:'−cos x + (1/3)cos³x + C'},
 {id:26,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫cos³(2x) dx',hint:'写成 cos(2x)[1−sin²(2x)]。',steps:['令 u=sin(2x)，du=2cos(2x)dx','原式=½∫(1−u²)du','积分后代回。'],answer:'(1/2)sin(2x) − (1/6)sin³(2x) + C'},
-{id:27,paper:'P3',topic:'换元积分',level:3,q:'求 ∫x cos(x²+1) dx',hint:'括号 x²+1 的导数含有 2x。',steps:['令 u=x²+1，du=2x dx','原式=½∫cosu du','代回并加 C。'],answer:'(1/2)sin(x²+1) + C'}
+{id:27,paper:'P3',topic:'换元积分',level:3,q:'求 ∫x cos(x²+1) dx',hint:'括号 x²+1 的导数含有 2x。',steps:['令 u=x²+1，du=2x dx','原式=½∫cosu du','代回并加 C。'],answer:'(1/2)sin(x²+1) + C'},
+{id:28,paper:'P4',topic:'代换积分',level:2,q:'求 ∫x√(x²+5) dx',hint:'令 u=x²+5。',steps:['u=x²+5，du=2x dx','原式=½∫u¹ᐟ²du','积分后把 u 代回。'],answer:'(1/3)(x²+5)³ᐟ² + C'},
+{id:29,paper:'P4',topic:'代换积分',level:2,q:'求 ∫sin x/(2+cos x)² dx',hint:'分母内 2+cosx 的导数是 −sinx。',steps:['令 u=2+cosx，du=−sinx dx','原式=−∫u⁻²du','积分并代回。'],answer:'1/(2+cos x) + C'},
+{id:30,paper:'P4',topic:'代换积分',level:3,q:'求 ∫sec²x√(1+tan x) dx',hint:'令 u=1+tanx。',steps:['du=sec²x dx','原式=∫u¹ᐟ²du','积分后代回。'],answer:'(2/3)(1+tan x)³ᐟ² + C'},
+{id:31,paper:'P4',topic:'代换积分',level:3,q:'计算 ∫₀¹ 6x²e^(2x³) dx',hint:'指数 2x³ 的导数为 6x²。',steps:['令 u=2x³，du=6x²dx','新上下限：x=0→u=0，x=1→u=2','计算 ∫₀²eᵘdu。'],answer:'e²−1'},
+{id:32,paper:'P4',topic:'代换积分',level:3,q:'求 ∫1/[x(1+ln x)³] dx，x>0',hint:'令 u=1+lnx，则 du=dx/x。',steps:['原式变为 ∫u⁻³du','积分得 −½u⁻²+C','把 u 代回。'],answer:'−1/[2(1+ln x)²] + C'},
+{id:33,paper:'P4',topic:'分部积分',level:2,q:'求 ∫x cos(2x) dx',hint:'令 u=x，dv=cos(2x)dx。',steps:['du=dx，v=½sin(2x)','使用 ∫u dv=uv−∫v du','再积分 sin(2x)。'],answer:'(x/2)sin(2x) + (1/4)cos(2x) + C'},
+{id:34,paper:'P4',topic:'分部积分',level:2,q:'求 ∫x e^(3x) dx',hint:'令 u=x，dv=e^(3x)dx。',steps:['du=dx，v=(1/3)e^(3x)','原式=(x/3)e^(3x)−(1/3)∫e^(3x)dx','整理并加 C。'],answer:'e^(3x)(x/3−1/9) + C'},
+{id:35,paper:'P4',topic:'分部积分',level:3,q:'求 ∫x² sin x dx',hint:'需要连续使用两次分部积分。',steps:['第一次令 u=x²，dv=sinx dx','得 −x²cosx+∫2xcosx dx','对 ∫2xcosx dx 再分部积分。'],answer:'−x²cos x + 2x sin x + 2cos x + C'},
+{id:36,paper:'P4',topic:'分部积分',level:3,q:'求 ∫eˣcos x dx',hint:'分部积分两次后，原积分会再次出现。',steps:['设 I=∫eˣcosx dx','分部积分两次得到 I=eˣcosx+eˣsinx−I','移项得 2I=eˣ(cosx+sinx)。'],answer:'(1/2)eˣ(sin x+cos x) + C'},
+{id:37,paper:'P4',topic:'分部积分',level:3,q:'计算 ∫₁ᵉ ln x dx',hint:'把 ln x 看成 ln x·1，然后分部积分。',steps:['令 u=lnx，dv=dx','得到 xlnx−x','代入 e 和 1。'],answer:'1'},
+{id:38,paper:'P4',topic:'部分分式',level:2,q:'求 ∫(3x+7)/[(x+1)(x+2)] dx',hint:'先设为 A/(x+1)+B/(x+2)。',steps:['3x+7=A(x+2)+B(x+1)','比较系数得 A=4，B=−1','分别积分两个一次分式。'],answer:'4ln|x+1|−ln|x+2| + C'},
+{id:39,paper:'P4',topic:'部分分式',level:3,q:'求 ∫(2x+5)/[(x−1)(x+2)] dx',hint:'设 A/(x−1)+B/(x+2)。',steps:['2x+5=A(x+2)+B(x−1)','令 x=1 得 A=7/3；令 x=−2 得 B=−1/3','逐项积分。'],answer:'(7/3)ln|x−1|−(1/3)ln|x+2| + C'},
+{id:40,paper:'P4',topic:'部分分式',level:3,q:'求 ∫(5x+1)/[x(x+1)²] dx',hint:'重复因式需要写成 A/x+B/(x+1)+C/(x+1)²。',steps:['比较系数得到 A=1，B=−1，C=4','积分 1/x 与 −1/(x+1)','∫4/(x+1)²dx=−4/(x+1)。'],answer:'ln|x|−ln|x+1|−4/(x+1) + C'},
+{id:41,paper:'P4',topic:'部分分式',level:3,q:'求 ∫(x²+4x+1)/(x²−1) dx',hint:'这是非真分式，先做多项式除法。',steps:['原式=1+(4x+2)/(x²−1)','把 (4x+2)/[(x−1)(x+1)] 拆分','得到 1+3/(x−1)+1/(x+1)。'],answer:'x+3ln|x−1|+ln|x+1| + C'},
+{id:42,paper:'P4',topic:'部分分式',level:3,q:'计算 ∫₀¹ 1/[(x+1)(x+2)] dx',hint:'拆成 1/(x+1)−1/(x+2)。',steps:['原函数为 ln(x+1)−ln(x+2)','代入 1 得 ln2−ln3','减去代入 0 的 ln1−ln2。'],answer:'ln(4/3)'}
 ];
 let paper='P3',topic='全部专题',index=0,tool='pen',size=3,drawing=false,history=[];
 const $=id=>document.getElementById(id), state=JSON.parse(localStorage.getItem('integral-progress')||'{"done":0,"wrong":[]}');
