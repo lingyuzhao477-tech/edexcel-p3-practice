@@ -9,7 +9,23 @@ const BANK=[
 {id:8,paper:'P4',topic:'三角积分',level:2,q:'求 ∫sin(2x) dx',hint:'2x 的导数是 2，所以需要补偿 1/2。',steps:['令 u=2x，则 du=2dx','原式=½∫sin u du','积分为 −½cos u','代回 u=2x。'],answer:'−½cos(2x) + C'},
 {id:9,paper:'P4',topic:'三角积分',level:3,q:'求 ∫tan x dx',hint:'把 tan x 写成 sin x/cos x，再令 u=cos x。',steps:['tan x=sin x/cos x','令 u=cos x，du=−sin x dx','原式=−∫1/u du','代回并加 C。'],answer:'−ln|cos x| + C'},
 {id:10,paper:'P4',topic:'部分分式',level:3,q:'求 ∫1/(x² − 1) dx',hint:'先把 1/[(x−1)(x+1)] 拆成部分分式。',steps:['拆为 1/[2(x−1)]−1/[2(x+1)]','分别使用 ∫1/x dx=ln|x|','得 ½ln|x−1|−½ln|x+1|+C','最后可合并两个对数。'],answer:'½ln|(x−1)/(x+1)| + C'},
-{id:11,paper:'P4',topic:'代换积分',level:3,q:'求 ∫x/√(x² + 4) dx',hint:'令 u=x²+4，分子 x dx 会变成 ½du。',steps:['令 u=x²+4','du=2x dx，所以 x dx=½du','原式=½∫u⁻¹ᐟ²du','积分后代回。'],answer:'√(x² + 4) + C'}
+{id:11,paper:'P4',topic:'代换积分',level:3,q:'求 ∫x/√(x² + 4) dx',hint:'令 u=x²+4，分子 x dx 会变成 ½du。',steps:['令 u=x²+4','du=2x dx，所以 x dx=½du','原式=½∫u⁻¹ᐟ²du','积分后代回。'],answer:'√(x² + 4) + C'},
+{id:12,paper:'P3',topic:'三角函数积分',level:1,q:'求 ∫sin(5x) dx',hint:'使用 ∫sin(ax)dx=−cos(ax)/a。',steps:['这里 a=5','对 sin(5x) 积分时除以 5','记得加积分常数 C。'],answer:'−(1/5)cos(5x) + C'},
+{id:13,paper:'P3',topic:'三角函数积分',level:1,q:'求 ∫cos(3x−2) dx',hint:'括号 3x−2 的导数是 3。',steps:['令 u=3x−2，则 du=3dx','原式=⅓∫cos u du','代回 u 并加 C。'],answer:'(1/3)sin(3x−2) + C'},
+{id:14,paper:'P3',topic:'三角函数积分',level:2,q:'求 ∫sec²(4x) dx',hint:'tan(4x) 的导数是 4sec²(4x)。',steps:['使用 ∫sec²u du=tan u','令 u=4x，dx=du/4','代回并加 C。'],answer:'(1/4)tan(4x) + C'},
+{id:15,paper:'P3',topic:'三角函数积分',level:2,q:'求 ∫cosec²(2x+1) dx',hint:'cot u 的导数是 −cosec²u。',steps:['令 u=2x+1，dx=du/2','原式=½∫cosec²u du','积分并代回。'],answer:'−(1/2)cot(2x+1) + C'},
+{id:16,paper:'P3',topic:'三角恒等式',level:2,q:'求 ∫sin²x dx',hint:'先用 sin²x=(1−cos2x)/2。',steps:['把 sin²x 改写为 ½−½cos2x','分别积分两项','∫cos2x dx=½sin2x。'],answer:'x/2 − (1/4)sin(2x) + C'},
+{id:17,paper:'P3',topic:'三角恒等式',level:2,q:'求 ∫cos²(3x) dx',hint:'使用 cos²u=(1+cos2u)/2。',steps:['cos²(3x)=½+½cos(6x)','分别积分','∫cos6x dx=(1/6)sin6x。'],answer:'x/2 + (1/12)sin(6x) + C'},
+{id:18,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫sin(2x)cos(5x) dx',hint:'使用积化和差：sinAcosB=½[sin(A+B)+sin(A−B)]。',steps:['sin2x cos5x=½[sin7x−sin3x]','分别积分两项','注意 ∫−sin3x dx=⅓cos3x。'],answer:'−(1/14)cos(7x) + (1/6)cos(3x) + C'},
+{id:19,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫cos(3x)cos x dx',hint:'使用 cosAcosB=½[cos(A+B)+cos(A−B)]。',steps:['cos3x cosx=½[cos4x+cos2x]','逐项积分','整理系数并加 C。'],answer:'(1/8)sin(4x) + (1/4)sin(2x) + C'},
+{id:20,paper:'P3',topic:'反向链式法则',level:2,q:'求 ∫sin x/(3+cos x) dx',hint:'分母 3+cos x 的导数是 −sin x。',steps:['令 u=3+cosx','du=−sinx dx','原式=−∫1/u du','代回并加 C。'],answer:'−ln|3+cos x| + C'},
+{id:21,paper:'P3',topic:'反向链式法则',level:2,q:'求 ∫sec²x/(2+tan x) dx',hint:'分母 2+tan x 的导数正好是 sec²x。',steps:['令 u=2+tanx','du=sec²x dx','得到 ∫1/u du','代回并加 C。'],answer:'ln|2+tan x| + C'},
+{id:22,paper:'P3',topic:'反向链式法则',level:3,q:'求 ∫6sin(3x)e^(2cos(3x)) dx',hint:'指数 2cos(3x) 的导数是 −6sin(3x)。',steps:['令 u=2cos(3x)','du=−6sin(3x)dx','原式=−∫eᵘdu','代回并加 C。'],answer:'−e^(2cos(3x)) + C'},
+{id:23,paper:'P3',topic:'定积分',level:2,q:'计算 ∫₀^(π/6) cos(3x) dx',hint:'角度必须使用弧度；先求原函数。',steps:['原函数为 (1/3)sin(3x)','代入上限得 (1/3)sin(π/2)=1/3','代入下限得 0。'],answer:'1/3'},
+{id:24,paper:'P3',topic:'定积分',level:3,q:'计算 ∫₀^(π/4) sec²(2x) dx',hint:'原函数是 ½tan(2x)，但先检查上限处函数是否有定义。',steps:['当 x→π/4 时，tan(2x)→∞','上限 x=π/4 处 cos(2x)=0','这是反常积分，并不收敛。'],answer:'积分发散（不存在有限值）'},
+{id:25,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫sin³x dx',hint:'保留一个 sinx，把 sin²x 换成 1−cos²x。',steps:['sin³x=sinx(1−cos²x)','令 u=cosx，du=−sinx dx','积分 −∫(1−u²)du','代回并加 C。'],answer:'−cos x + (1/3)cos³x + C'},
+{id:26,paper:'P3',topic:'三角恒等式',level:3,q:'求 ∫cos³(2x) dx',hint:'写成 cos(2x)[1−sin²(2x)]。',steps:['令 u=sin(2x)，du=2cos(2x)dx','原式=½∫(1−u²)du','积分后代回。'],answer:'(1/2)sin(2x) − (1/6)sin³(2x) + C'},
+{id:27,paper:'P3',topic:'换元积分',level:3,q:'求 ∫x cos(x²+1) dx',hint:'括号 x²+1 的导数含有 2x。',steps:['令 u=x²+1，du=2x dx','原式=½∫cosu du','代回并加 C。'],answer:'(1/2)sin(x²+1) + C'}
 ];
 let paper='P3',topic='全部专题',index=0,tool='pen',size=3,drawing=false,history=[];
 const $=id=>document.getElementById(id), state=JSON.parse(localStorage.getItem('integral-progress')||'{"done":0,"wrong":[]}');
